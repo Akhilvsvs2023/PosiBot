@@ -27,7 +27,7 @@ public class ClientService implements ClientServiceI {
 	@Override
 	public String saveClientDetails(String clientInfo) throws Exception {
 		try {
-			Map<String, Class> dataTypesMap = generateDataTypeMap(ClientDetails.class);
+			Map<String, Class<?>> dataTypesMap = generateDataTypeMap(ClientDetails.class);
 			Map<String, String> keyWordsMap = generateKeyWordMap(dataTypesMap.keySet());
 			Map<String, Object> dataMap = extractClientDetails(keyWordsMap, dataTypesMap, clientInfo.toLowerCase());
 			ClientDetails data = prepareDTO(dataMap, dataTypesMap);
@@ -39,7 +39,7 @@ public class ClientService implements ClientServiceI {
 		}
 	}
 
-	private ClientDetails prepareDTO(Map<String, Object> dataMap, Map<String, Class> dataTypesMap) throws Exception {
+	private ClientDetails prepareDTO(Map<String, Object> dataMap, Map<String, Class<?>> dataTypesMap) throws Exception {
 		ClientDetails dto = new ClientDetails();
 		for (Map.Entry<String, Object> entry : dataMap.entrySet()) {
 			String key = entry.getKey();
@@ -51,7 +51,7 @@ public class ClientService implements ClientServiceI {
 		return dto;
 	}
 
-	private Map<String, Object> extractClientDetails(Map<String, String> keyWordsMap, Map<String, Class> dataTypesMap,
+	private Map<String, Object> extractClientDetails(Map<String, String> keyWordsMap, Map<String, Class<?>> dataTypesMap,
 			String clientInfo) {
 		Map<String, Object> retValue = new LinkedHashMap<>();
 		Arrays.asList(clientInfo.split("\n")).forEach(x -> {
@@ -79,15 +79,15 @@ public class ClientService implements ClientServiceI {
 		SimpleDateFormat formatter = new SimpleDateFormat("dd MMMM yyyy");
 		try {
 			java.util.Date utilDate = formatter.parse(value.toLowerCase());
-			Date sqlDate = new Date(utilDate.getTime());
-			return sqlDate;
+			return new Date(utilDate.getTime());
 		} catch (ParseException e) {
+			logger.info("Error while parsing :: "+value);
 			throw e;
 		}
 	}
 
-	private Map<String, Class> generateDataTypeMap(Class<?> clazz) {
-		Map<String, Class> dataTypesMap = new LinkedHashMap<>();
+	private Map<String, Class<?>> generateDataTypeMap(Class<?> clazz) {
+		Map<String, Class<?>> dataTypesMap = new LinkedHashMap<>();
 		for (Field field : clazz.getDeclaredFields()) {
 			dataTypesMap.put(field.getName(), field.getType());
 		}
