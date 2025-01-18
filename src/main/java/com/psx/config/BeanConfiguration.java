@@ -39,14 +39,15 @@ public class BeanConfiguration {
 	public JpaVendorAdapter getJpaVendorAdapter() {
 		return new HibernateJpaVendorAdapter();
 	}
-
+	
+	@Bean
 	public BasicDataSource basicDataSource() {
 		return getDataSource(env.getProperty("database.driverClassName"), env.getProperty("database.url"),
 				env.getProperty("database.userName"), env.getProperty("database.password"),
 				Integer.parseInt(env.getProperty("database.maxTotalConnections")),
 				Integer.parseInt(env.getProperty("database.maxIdleConnections")));
 	}
-
+	
 	private BasicDataSource getDataSource(String className, String url, String userName, String password, int maxTotal,
 			int maxIdle) {
 		BasicDataSource basicDataSource = new BasicDataSource();

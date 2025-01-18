@@ -2,15 +2,22 @@ package com.psx.service;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.sql.Connection;
 import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +30,9 @@ public class ClientService implements ClientServiceI {
 	@Autowired
 	ClientRepository repo;
 	Logger logger = Logger.getLogger(ClientService.class.getName());
+
+	@Autowired
+	BasicDataSource ds;
 
 	@Override
 	public String saveClientDetails(String clientInfo) throws Exception {
@@ -39,6 +49,80 @@ public class ClientService implements ClientServiceI {
 		}
 	}
 
+	@Override
+	public List<ClientDetails> fetchClientDetails(String clientInfo) throws Exception {
+		List<ClientDetails> retValue = new ArrayList<>();
+		try {
+			Map<String, Class<?>> dataTypesMap = generateDataTypeMap(ClientDetails.class);
+			Map<String, String> keyWordsMap = generateKeyWordMap(dataTypesMap.keySet());
+			Map<String, Object> dataMap = extractClientDetails(keyWordsMap, dataTypesMap, clientInfo.toLowerCase());
+			String preparedStatement = generatePrepareStatement(dataMap);
+			try (Connection con = ds.getConnection();
+					PreparedStatement ps = con
+							.prepareStatement(preparedStatement.substring(0, preparedStatement.length() - 4));) {
+				populatePrepareStatement(ps, dataTypesMap, dataMap);
+				try (ResultSet rs = ps.executeQuery();) {
+					while (rs.next()) {
+						retValue.add(populateClientDetails(rs, dataTypesMap));
+					}
+				}
+			} catch (Exception e) {
+				logger.info(e.getMessage());
+				throw e;
+			}
+			return retValue;
+		} catch (Exception e) {
+			logger.info(e.getMessage());
+			throw e;
+		}
+	}
+
+	private ClientDetails populateClientDetails(ResultSet rs, Map<String, Class<?>> dataTypesMap) throws Exception {
+		ClientDetails c = new ClientDetails();
+		for (Map.Entry<String, Class<?>> entry : dataTypesMap.entrySet()) {
+			String field = entry.getKey();
+			Class clazz = entry.getValue();
+			String methodName = "set" + field.substring(0, 1).toUpperCase() + field.substring(1);
+			Method method = c.getClass().getMethod(methodName, clazz);
+			method.invoke(c, getValue(rs, field, clazz));
+		}
+		return c;
+	}
+
+	private Object getValue(ResultSet rs, String field, Class clazz) throws Exception {
+		if (clazz == Integer.class) {
+			return rs.getInt(field);
+		} else if (clazz == String.class) {
+			return rs.getString(field);
+		} else if (clazz == Date.class) {
+			return rs.getDate(field);
+		} else if (clazz == Float.class) {
+			return rs.getFloat(field);
+		} else if (clazz == Double.class) {
+			return rs.getDouble(field);
+		} else {
+			return rs.getObject(field);
+		}
+	}
+
+	private void populatePrepareStatement(PreparedStatement ps, Map<String, Class<?>> dataTypesMap,
+			Map<String, Object> dataMap) throws SQLException {
+		int i = 1;
+		for (Map.Entry<String, Object> entry : dataMap.entrySet()) {
+			ps.setObject(i, entry.getValue());
+			i++;
+		}
+	}
+
+	private String generatePrepareStatement(Map<String, Object> dataMap) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("select * from psx_client_details where ");
+		dataMap.keySet().forEach(x -> {
+			sb.append(x + "=? AND ");
+		});
+		return sb.toString();
+	}
+
 	private ClientDetails prepareDTO(Map<String, Object> dataMap, Map<String, Class<?>> dataTypesMap) throws Exception {
 		ClientDetails dto = new ClientDetails();
 		for (Map.Entry<String, Object> entry : dataMap.entrySet()) {
@@ -51,8 +135,8 @@ public class ClientService implements ClientServiceI {
 		return dto;
 	}
 
-	private Map<String, Object> extractClientDetails(Map<String, String> keyWordsMap, Map<String, Class<?>> dataTypesMap,
-			String clientInfo) {
+	private Map<String, Object> extractClientDetails(Map<String, String> keyWordsMap,
+			Map<String, Class<?>> dataTypesMap, String clientInfo) {
 		Map<String, Object> retValue = new LinkedHashMap<>();
 		Arrays.asList(clientInfo.split("\n")).forEach(x -> {
 			keyWordsMap.forEach((a, b) -> {
@@ -81,7 +165,7 @@ public class ClientService implements ClientServiceI {
 			java.util.Date utilDate = formatter.parse(value.toLowerCase());
 			return new Date(utilDate.getTime());
 		} catch (ParseException e) {
-			logger.info("Error while parsing :: "+value);
+			logger.info("Error while parsing :: " + value);
 			throw e;
 		}
 	}
