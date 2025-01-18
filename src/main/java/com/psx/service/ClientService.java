@@ -7,8 +7,6 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -23,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import com.psx.entity.ClientDetails;
 import com.psx.repo.ClientRepository;
+import com.psx.utils.CleanerUtils;
 
 @Service
 public class ClientService implements ClientServiceI {
@@ -58,8 +57,7 @@ public class ClientService implements ClientServiceI {
 			Map<String, Object> dataMap = extractClientDetails(keyWordsMap, dataTypesMap, clientInfo.toLowerCase());
 			String preparedStatement = generatePrepareStatement(dataMap);
 			try (Connection con = ds.getConnection();
-					PreparedStatement ps = con
-							.prepareStatement(preparedStatement.substring(0, preparedStatement.length() - 4));) {
+					PreparedStatement ps = con.prepareStatement(preparedStatement.substring(0, preparedStatement.length() - 4));) {
 				populatePrepareStatement(ps, dataTypesMap, dataMap);
 				try (ResultSet rs = ps.executeQuery();) {
 					while (rs.next()) {
@@ -94,6 +92,8 @@ public class ClientService implements ClientServiceI {
 			return rs.getInt(field);
 		} else if (clazz == String.class) {
 			return rs.getString(field);
+		}else if (clazz == Long.class) {
+			return rs.getLong(field);
 		} else if (clazz == Date.class) {
 			return rs.getDate(field);
 		} else if (clazz == Float.class) {
@@ -135,39 +135,35 @@ public class ClientService implements ClientServiceI {
 		return dto;
 	}
 
-	private Map<String, Object> extractClientDetails(Map<String, String> keyWordsMap,
-			Map<String, Class<?>> dataTypesMap, String clientInfo) {
+	private Map<String, Object> extractClientDetails(Map<String, String> keyWordsMap, Map<String, Class<?>> dataTypesMap, String clientInfo) {
 		Map<String, Object> retValue = new LinkedHashMap<>();
 		Arrays.asList(clientInfo.split("\n")).forEach(x -> {
 			keyWordsMap.forEach((a, b) -> {
 				if (x.contains(a)) {
 					String value = x.substring(a.length());
 					if (dataTypesMap.get(b) == String.class) {
-						retValue.put(b, value.trim());
+						retValue.put(b, CleanerUtils.cleanString(value));
+					}  else if(dataTypesMap.get(b) == Integer.class) {
+						retValue.put(b, CleanerUtils.cleanInteger(value));
+					}else if(dataTypesMap.get(b) == Long.class) {
+						retValue.put(b, CleanerUtils.cleanLong(value));
+					} else if(dataTypesMap.get(b) == Float.class) {
+						retValue.put(b, CleanerUtils.cleanFloat(value));
+					} else if(dataTypesMap.get(b) == Double.class) {
+						retValue.put(b, CleanerUtils.cleanDouble(value));
 					} else if (dataTypesMap.get(b) == Date.class) {
 						try {
-							retValue.put(b, extractDate(value));
+							retValue.put(b, CleanerUtils.cleanDate(value));
 						} catch (Exception e) {
 							throw new RuntimeException("Data is unclear, unable to parse date");
 						}
-					} else {
+					}else {
 						logger.info("No specified datatype mentioned  for " + b);
 					}
 				}
 			});
 		});
 		return retValue;
-	}
-
-	private Date extractDate(String value) throws Exception {
-		SimpleDateFormat formatter = new SimpleDateFormat("dd MMMM yyyy");
-		try {
-			java.util.Date utilDate = formatter.parse(value.toLowerCase());
-			return new Date(utilDate.getTime());
-		} catch (ParseException e) {
-			logger.info("Error while parsing :: " + value);
-			throw e;
-		}
 	}
 
 	private Map<String, Class<?>> generateDataTypeMap(Class<?> clazz) {
