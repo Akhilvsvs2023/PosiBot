@@ -18,9 +18,7 @@ public class BeanConfiguration {
 
 	@Autowired
 	Environment env;
-	
-	
-	
+
 	@Bean(name = "entityManagerFactory")
 	public LocalContainerEntityManagerFactoryBean getEntityManagerFactoryBean() {
 		LocalContainerEntityManagerFactoryBean lcemfb = new LocalContainerEntityManagerFactoryBean();
@@ -28,7 +26,7 @@ public class BeanConfiguration {
 		lcemfb.setDataSource(basicDataSource());
 		lcemfb.setPersistenceUnitName("myJpaPersistenceUnit");
 		lcemfb.setPackagesToScan("com.psx.*");
-		lcemfb.setJpaProperties(jpaProperties());
+		lcemfb.setJpaProperties(new Properties());
 		return lcemfb;
 	}
 
@@ -41,18 +39,15 @@ public class BeanConfiguration {
 	public JpaVendorAdapter getJpaVendorAdapter() {
 		return new HibernateJpaVendorAdapter();
 	}
-
+	
+	@Bean
 	public BasicDataSource basicDataSource() {
-		return getDataSource(env.getProperty("database.driverClassName"), env.getProperty("database.url"), env.getProperty("database.userName"),
-				env.getProperty("database.password"), Integer.parseInt(env.getProperty("database.maxTotalConnections")),
+		return getDataSource(env.getProperty("database.driverClassName"), env.getProperty("database.url"),
+				env.getProperty("database.userName"), env.getProperty("database.password"),
+				Integer.parseInt(env.getProperty("database.maxTotalConnections")),
 				Integer.parseInt(env.getProperty("database.maxIdleConnections")));
 	}
-
-	private Properties jpaProperties() {
-		Properties properties = new Properties();
-		return properties;
-	}
-
+	
 	private BasicDataSource getDataSource(String className, String url, String userName, String password, int maxTotal,
 			int maxIdle) {
 		BasicDataSource basicDataSource = new BasicDataSource();
