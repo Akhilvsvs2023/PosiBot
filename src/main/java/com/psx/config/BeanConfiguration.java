@@ -18,7 +18,9 @@ public class BeanConfiguration {
 
 	@Autowired
 	Environment env;
-
+	
+	
+	
 	@Bean(name = "entityManagerFactory")
 	public LocalContainerEntityManagerFactoryBean getEntityManagerFactoryBean() {
 		LocalContainerEntityManagerFactoryBean lcemfb = new LocalContainerEntityManagerFactoryBean();
