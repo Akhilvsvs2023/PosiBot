@@ -48,6 +48,10 @@ public class CleanerUtils {
 	}
 
 	public static Date cleanDate(String value) throws Exception {
+		value = value.replaceAll("hyphen", "-");
+		value = value.replaceAll("dash", "-");
+		value = value.replaceAll("slash", "/");
+		value = value.replaceAll("bar", "/");
 		value = value.replaceAll("\\s+", "").trim();
 		String[] arr = new String[3];
 		Map<Integer, String> map = generateMonthMap();

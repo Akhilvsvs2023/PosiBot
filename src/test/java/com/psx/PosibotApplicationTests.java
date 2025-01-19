@@ -47,7 +47,7 @@ class PosibotApplicationTests {
 			System.out.println("TestCase4 Failed");
 		}
 	}
-	
+
 	@Test
 	void cleanerTestCase5() {
 		String a = "123  45 6 7  0  123456 789";
@@ -57,7 +57,7 @@ class PosibotApplicationTests {
 			System.out.println("TestCase5 Failed");
 		}
 	}
-	
+
 	@Test
 	void cleanerTestCase6() {
 		String a = "123  4567 . 8908";
@@ -67,54 +67,95 @@ class PosibotApplicationTests {
 			System.out.println("TestCase6 Failed");
 		}
 	}
-	
+
 	@Test
 	void cleanerTestCase7() throws Exception {
 		String a = "199 9  - 1 2 -   18  ";
-		if (CleanerUtils.cleanDate(a).toString() .equals("1999-12-18")) {
+		if (CleanerUtils.cleanDate(a).toString().equals("1999-12-18")) {
 			System.out.println("TestCase7 Passed");
 		} else {
 			System.out.println("TestCase7 Failed");
 		}
 	}
-	
+
 	@Test
 	void cleanerTestCase8() throws Exception {
 		String a = "18 - 1 2  - 1999";
-		if (CleanerUtils.cleanDate(a).toString() .equals("1999-12-18")) {
+		if (CleanerUtils.cleanDate(a).toString().equals("1999-12-18")) {
 			System.out.println("TestCase8 Passed");
 		} else {
 			System.out.println("TestCase8 Failed");
 		}
 	}
-	
+
 	@Test
 	void cleanerTestCase9() throws Exception {
 		String a = "18 dece m b e r 1999";
-		if (CleanerUtils.cleanDate(a).toString() .equals("1999-12-18")) {
+		if (CleanerUtils.cleanDate(a).toString().equals("1999-12-18")) {
 			System.out.println("TestCase9 Passed");
 		} else {
 			System.out.println("TestCase9 Failed");
 		}
 	}
-	
+
 	@Test
 	void cleanerTestCase10() throws Exception {
 		String a = "199 9 dece m b e r 18  ";
-		if (CleanerUtils.cleanDate(a).toString() .equals("1999-12-18")) {
+		if (CleanerUtils.cleanDate(a).toString().equals("1999-12-18")) {
 			System.out.println("TestCase10 Passed");
 		} else {
 			System.out.println("TestCase10 Failed");
 		}
 	}
-	
+
 	@Test
 	void cleanerTestCase11() throws Exception {
-		String a = "my name is akhil my D O B is 18 december 1999.my R T O is ABCD E\nmy fathername is Akhil";
-		if (CleanerUtils.initialDataClean(a).equals("my name is akhil\nmy dob is 18 december 1999\nmy rto is ABCD E\nmy fathername is Akhil")) {
+		String a = "1999bar12bar18";
+		if (CleanerUtils.cleanDate(a).toString().equals("1999-12-18")) {
 			System.out.println("TestCase11 Passed");
 		} else {
 			System.out.println("TestCase11 Failed");
+		}
+	}
+
+	@Test
+	void cleanerTestCase12() throws Exception {
+		String a = "1999slash12slash18";
+		if (CleanerUtils.cleanDate(a).toString().equals("1999-12-18")) {
+			System.out.println("TestCase12 Passed");
+		} else {
+			System.out.println("TestCase12 Failed");
+		}
+	}
+
+	@Test
+	void cleanerTestCase13() throws Exception {
+		String a = "1999dash12dash18";
+		if (CleanerUtils.cleanDate(a).toString().equals("1999-12-18")) {
+			System.out.println("TestCase13 Passed");
+		} else {
+			System.out.println("TestCase13 Failed");
+		}
+	}
+	
+	@Test
+	void cleanerTestCase14() throws Exception {
+		String a = "18hyphen12hyphen1999";
+		if (CleanerUtils.cleanDate(a).toString() .equals("1999-12-18")) {
+			System.out.println("TestCase14 Passed");
+		} else {
+			System.out.println("TestCase14 Failed");
+		}
+	}
+
+	@Test
+	void cleanerTestCase15() throws Exception {
+		String a = "my name is akhil my D O B is 18 december 1999.my R T O is ABCD E\nmy fathername is Akhil";
+		if (CleanerUtils.initialDataClean(a)
+				.equals("my name is akhil\nmy dob is 18 december 1999\nmy rto is ABCD E\nmy fathername is Akhil")) {
+			System.out.println("TestCase15 Passed");
+		} else {
+			System.out.println("TestCase15 Failed");
 		}
 	}
 }
