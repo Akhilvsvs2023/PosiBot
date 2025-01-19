@@ -3,10 +3,8 @@ package com.psx.utils;
 import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -48,12 +46,12 @@ public class CleanerUtils {
 	}
 
 	public static Date cleanDate(String value) throws Exception {
-		value = value.replaceAll("hyphen", "-");
-		value = value.replaceAll("dash", "-");
-		value = value.replaceAll("slash", "/");
-		value = value.replaceAll("bar", "/");
+		value = value.replace("hyphen", "-");
+		value = value.replace("dash", "-");
+		value = value.replace("slash", "/");
+		value = value.replace("bar", "/");
 		value = value.replaceAll("\\s+", "").trim();
-		String[] arr = new String[3];
+		String[] arr;
 		Map<Integer, String> map = generateMonthMap();
 		String result = "";
 		if (Pattern.matches("^(0[1-9]|[12][0-9]|3[01])(-|/)(0[1-9]|1[012])(-|/)((19|2[0-9])[0-9]{2})$", value)) {

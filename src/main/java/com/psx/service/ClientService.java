@@ -36,6 +36,7 @@ public class ClientService implements ClientServiceI {
 	@Override
 	public String saveClientDetails(String clientInfo) throws Exception {
 		try {
+			clientInfo=CleanerUtils.initialDataClean(clientInfo.toLowerCase());
 			Map<String, Class<?>> dataTypesMap = generateDataTypeMap(ClientDetails.class);
 			Map<String, String> keyWordsMap = generateKeyWordMap(dataTypesMap.keySet());
 			Map<String, Object> dataMap = extractClientDetails(keyWordsMap, dataTypesMap, clientInfo.toLowerCase());
@@ -52,25 +53,24 @@ public class ClientService implements ClientServiceI {
 	public List<ClientDetails> fetchClientDetails(String clientInfo) throws Exception {
 		List<ClientDetails> retValue = new ArrayList<>();
 		try {
+			clientInfo=CleanerUtils.initialDataClean(clientInfo.toLowerCase());
 			Map<String, Class<?>> dataTypesMap = generateDataTypeMap(ClientDetails.class);
 			Map<String, String> keyWordsMap = generateKeyWordMap(dataTypesMap.keySet());
 			Map<String, Object> dataMap = extractClientDetails(keyWordsMap, dataTypesMap, clientInfo.toLowerCase());
 			String preparedStatement = generatePrepareStatement(dataMap);
 			try (Connection con = ds.getConnection();
 					PreparedStatement ps = con.prepareStatement(preparedStatement.substring(0, preparedStatement.length() - 4));) {
-				populatePrepareStatement(ps, dataTypesMap, dataMap);
+				populatePrepareStatement(ps, dataMap);
 				try (ResultSet rs = ps.executeQuery();) {
 					while (rs.next()) {
 						retValue.add(populateClientDetails(rs, dataTypesMap));
 					}
 				}
 			} catch (Exception e) {
-				logger.info(e.getMessage());
 				throw e;
 			}
 			return retValue;
 		} catch (Exception e) {
-			logger.info(e.getMessage());
 			throw e;
 		}
 	}
@@ -79,7 +79,7 @@ public class ClientService implements ClientServiceI {
 		ClientDetails c = new ClientDetails();
 		for (Map.Entry<String, Class<?>> entry : dataTypesMap.entrySet()) {
 			String field = entry.getKey();
-			Class clazz = entry.getValue();
+			Class<?> clazz = entry.getValue();
 			String methodName = "set" + field.substring(0, 1).toUpperCase() + field.substring(1);
 			Method method = c.getClass().getMethod(methodName, clazz);
 			method.invoke(c, getValue(rs, field, clazz));
@@ -87,7 +87,7 @@ public class ClientService implements ClientServiceI {
 		return c;
 	}
 
-	private Object getValue(ResultSet rs, String field, Class clazz) throws Exception {
+	private Object getValue(ResultSet rs, String field, Class<?> clazz) throws Exception {
 		if (clazz == Integer.class) {
 			return rs.getInt(field);
 		} else if (clazz == String.class) {
@@ -105,8 +105,7 @@ public class ClientService implements ClientServiceI {
 		}
 	}
 
-	private void populatePrepareStatement(PreparedStatement ps, Map<String, Class<?>> dataTypesMap,
-			Map<String, Object> dataMap) throws SQLException {
+	private void populatePrepareStatement(PreparedStatement ps,	Map<String, Object> dataMap) throws SQLException {
 		int i = 1;
 		for (Map.Entry<String, Object> entry : dataMap.entrySet()) {
 			ps.setObject(i, entry.getValue());
@@ -117,9 +116,7 @@ public class ClientService implements ClientServiceI {
 	private String generatePrepareStatement(Map<String, Object> dataMap) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("select * from psx_client_details where ");
-		dataMap.keySet().forEach(x -> {
-			sb.append(x + "=? AND ");
-		});
+		dataMap.keySet().forEach(x -> sb.append(x + "=? AND "));
 		return sb.toString();
 	}
 
