@@ -3,8 +3,12 @@ package com.psx.utils;
 import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class CleanerUtils {
@@ -55,11 +59,13 @@ public class CleanerUtils {
 			arr = (value.contains("-")) ? value.split("-") : value.split("/");
 			result = arr[2] + " " + map.get(Integer.parseInt(arr[1])) + " " + arr[0];
 		} else if (Pattern.matches("^\\d{2}[A-Za-z]+\\d{4}$", value)) {
-			result = value.substring(0, 2) + " " + value.substring(2, value.length() - 4) + " "	+ value.substring(value.length() - 4);
+			result = value.substring(0, 2) + " " + value.substring(2, value.length() - 4) + " "
+					+ value.substring(value.length() - 4);
 		} else if (Pattern.matches("^\\d{4}[A-Za-z]+\\d{2}$", value)) {
-			result = value.substring(value.length() - 2) + " " + value.substring(4, value.length() - 2) + " " + value.substring(0, 4);
+			result = value.substring(value.length() - 2) + " " + value.substring(4, value.length() - 2) + " "
+					+ value.substring(0, 4);
 		} else {
-			throw new Exception("Unregistered format :: "+value);
+			throw new Exception("Unregistered format :: " + value);
 		}
 		SimpleDateFormat formatter = new SimpleDateFormat("dd MMMM yyyy");
 		try {
@@ -85,5 +91,29 @@ public class CleanerUtils {
 		monthMap.put(11, "November");
 		monthMap.put(12, "December");
 		return monthMap;
+	}
+
+	public static String initialDataClean(String input) {
+		StringBuilder retVal = new StringBuilder();
+		input = input.replace(" my ", "\nmy ");
+		input = input.replace(".my ", "\nmy ");
+		Arrays.asList(input.split("\n")).forEach(x -> {
+			retVal.append("my ");
+			retVal.append(CleanerUtils.extractFieldName(x).replaceAll("\\s+", "").trim().toLowerCase() + " is ");
+			retVal.append(x.substring(("my " + CleanerUtils.extractFieldName(x) + " is ").length()) + "\n");
+		});
+		return retVal.toString().trim();
+	}
+
+	public static String extractFieldName(String input) {
+		String regex = "^my (.*?) is ";
+		Pattern pattern = Pattern.compile(regex);
+		Matcher matcher = pattern.matcher(input);
+
+		if (matcher.find()) {
+			return matcher.group(1);
+		} else {
+			return null;
+		}
 	}
 }
