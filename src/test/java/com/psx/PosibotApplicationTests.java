@@ -1,7 +1,5 @@
 package com.psx;
 
-import java.util.regex.Pattern;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -107,6 +105,16 @@ class PosibotApplicationTests {
 			System.out.println("TestCase10 Passed");
 		} else {
 			System.out.println("TestCase10 Failed");
+		}
+	}
+	
+	@Test
+	void cleanerTestCase11() throws Exception {
+		String a = "my name is akhil my D O B is 18 december 1999.my R T O is ABCD E\nmy fathername is Akhil";
+		if (CleanerUtils.initialDataClean(a).equals("my name is akhil\nmy dob is 18 december 1999\nmy rto is ABCD E\nmy fathername is Akhil")) {
+			System.out.println("TestCase11 Passed");
+		} else {
+			System.out.println("TestCase11 Failed");
 		}
 	}
 }
