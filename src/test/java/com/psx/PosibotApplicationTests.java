@@ -1,5 +1,7 @@
 package com.psx;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -11,151 +13,90 @@ class PosibotApplicationTests {
 	@Test
 	void cleanerTestCase1() {
 		String a = "Akhil Chinnu  V   S v S";
-		if (CleanerUtils.cleanString(a).equals("Akhil Chinnu V S V S")) {
-			System.out.println("TestCase1 Passed");
-		} else {
-			System.out.println("TestCase1 Failed");
-		}
+		assertEquals("Akhil Chinnu V S V S", CleanerUtils.cleanString(a));
 	}
 
 	@Test
 	void cleanerTestCase2() {
 		String a = "VudaTha SRI      VenkaTA SAI Akhil              ";
-		if (CleanerUtils.cleanString(a).equals("Vudatha Sri Venkata Sai Akhil")) {
-			System.out.println("TestCase2 Passed");
-		} else {
-			System.out.println("TestCase2 Failed");
-		}
+		assertEquals("Vudatha Sri Venkata Sai Akhil", CleanerUtils.cleanString(a));
 	}
 
 	@Test
 	void cleanerTestCase3() {
 		String a = "123  45 6 7 89";
-		if (CleanerUtils.cleanInteger(a) == 123456789) {
-			System.out.println("TestCase3 Passed");
-		} else {
-			System.out.println("TestCase3 Failed");
-		}
+		assertEquals(123456789,CleanerUtils.cleanInteger(a));
 	}
 
 	@Test
 	void cleanerTestCase4() {
 		String a = "123 45.  7";
-		if (CleanerUtils.cleanFloat(a) == 12345.7f) {
-			System.out.println("TestCase4 Passed");
-		} else {
-			System.out.println("TestCase4 Failed");
-		}
+		assertEquals(12345.7f,CleanerUtils.cleanFloat(a));
 	}
 
 	@Test
 	void cleanerTestCase5() {
 		String a = "123  45 6 7  0  123456 789";
-		if (CleanerUtils.cleanLong(a) == 12345670123456789l) {
-			System.out.println("TestCase5 Passed");
-		} else {
-			System.out.println("TestCase5 Failed");
-		}
+		assertEquals(12345670123456789l,CleanerUtils.cleanLong(a));
 	}
 
 	@Test
 	void cleanerTestCase6() {
 		String a = "123  4567 . 8908";
-		if (CleanerUtils.cleanDouble(a) == 1234567.8908) {
-			System.out.println("TestCase6 Passed");
-		} else {
-			System.out.println("TestCase6 Failed");
-		}
+		assertEquals(1234567.8908,CleanerUtils.cleanDouble(a));
 	}
 
 	@Test
 	void cleanerTestCase7() throws Exception {
 		String a = "199 9  - 1 2 -   18  ";
-		if (CleanerUtils.cleanDate(a).toString().equals("1999-12-18")) {
-			System.out.println("TestCase7 Passed");
-		} else {
-			System.out.println("TestCase7 Failed");
-		}
+		assertEquals("1999-12-18",CleanerUtils.cleanDate(a).toString());
 	}
 
 	@Test
 	void cleanerTestCase8() throws Exception {
 		String a = "18 - 1 2  - 1999";
-		if (CleanerUtils.cleanDate(a).toString().equals("1999-12-18")) {
-			System.out.println("TestCase8 Passed");
-		} else {
-			System.out.println("TestCase8 Failed");
-		}
+		assertEquals("1999-12-18",CleanerUtils.cleanDate(a).toString());
 	}
 
 	@Test
 	void cleanerTestCase9() throws Exception {
 		String a = "18 dece m b e r 1999";
-		if (CleanerUtils.cleanDate(a).toString().equals("1999-12-18")) {
-			System.out.println("TestCase9 Passed");
-		} else {
-			System.out.println("TestCase9 Failed");
-		}
+		assertEquals("1999-12-18",CleanerUtils.cleanDate(a).toString());
 	}
 
 	@Test
 	void cleanerTestCase10() throws Exception {
 		String a = "199 9 dece m b e r 18  ";
-		if (CleanerUtils.cleanDate(a).toString().equals("1999-12-18")) {
-			System.out.println("TestCase10 Passed");
-		} else {
-			System.out.println("TestCase10 Failed");
-		}
+		assertEquals("1999-12-18",CleanerUtils.cleanDate(a).toString());
 	}
 
 	@Test
 	void cleanerTestCase11() throws Exception {
 		String a = "1999bar12bar18";
-		if (CleanerUtils.cleanDate(a).toString().equals("1999-12-18")) {
-			System.out.println("TestCase11 Passed");
-		} else {
-			System.out.println("TestCase11 Failed");
-		}
+		assertEquals("1999-12-18",CleanerUtils.cleanDate(a).toString());
 	}
 
 	@Test
 	void cleanerTestCase12() throws Exception {
 		String a = "1999slash12slash18";
-		if (CleanerUtils.cleanDate(a).toString().equals("1999-12-18")) {
-			System.out.println("TestCase12 Passed");
-		} else {
-			System.out.println("TestCase12 Failed");
-		}
+		assertEquals("1999-12-18",CleanerUtils.cleanDate(a).toString());
 	}
 
 	@Test
 	void cleanerTestCase13() throws Exception {
 		String a = "1999dash12dash18";
-		if (CleanerUtils.cleanDate(a).toString().equals("1999-12-18")) {
-			System.out.println("TestCase13 Passed");
-		} else {
-			System.out.println("TestCase13 Failed");
-		}
+		assertEquals("1999-12-18",CleanerUtils.cleanDate(a).toString());
 	}
 	
 	@Test
 	void cleanerTestCase14() throws Exception {
 		String a = "18hyphen12hyphen1999";
-		if (CleanerUtils.cleanDate(a).toString() .equals("1999-12-18")) {
-			System.out.println("TestCase14 Passed");
-		} else {
-			System.out.println("TestCase14 Failed");
-		}
+		assertEquals("1999-12-18",CleanerUtils.cleanDate(a).toString());
 	}
 
 	@Test
-	void cleanerTestCase15() throws Exception {
+	void cleanerTestCase15() {
 		String a = "my name is akhil my D O B is 18 december 1999.my R T O is ABCD E\nmy fathername is Akhil";
-		if (CleanerUtils.initialDataClean(a)
-				.equals("my name is akhil\nmy dob is 18 december 1999\nmy rto is ABCD E\nmy fathername is Akhil")) {
-			System.out.println("TestCase15 Passed");
-		} else {
-			System.out.println("TestCase15 Failed");
-		}
+		assertEquals("my name is akhil\nmy dob is 18 december 1999\nmy rto is ABCD E\nmy fathername is Akhil",CleanerUtils.initialDataClean(a));
 	}
 }
