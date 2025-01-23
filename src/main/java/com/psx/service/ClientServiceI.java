@@ -10,4 +10,5 @@ import com.psx.entity.ClientDetails;
 public interface ClientServiceI {
 	public String saveClientDetails(String clientInfo) throws Exception;
 	public List<ClientDetails> fetchClientDetails(String clientInfo) throws Exception;
+	public List<ClientDetails> getClientDetails() throws Exception;
 }
