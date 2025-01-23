@@ -179,4 +179,9 @@ public class ClientService implements ClientServiceI {
 		return keyWordsMap;
 	}
 
+	@Override
+	public List<ClientDetails> getClientDetails() throws Exception {
+		return repo.findAll();
+	}
+
 }
