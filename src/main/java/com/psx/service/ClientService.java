@@ -13,12 +13,16 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
+
+import javax.management.RuntimeErrorException;
 
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.psx.dto.ResultDTO;
 import com.psx.entity.ClientDetails;
 import com.psx.repo.ClientRepository;
 import com.psx.utils.CleanerUtils;
@@ -50,7 +54,7 @@ public class ClientService implements ClientServiceI {
 	}
 
 	@Override
-	public List<ClientDetails> fetchClientDetails(String clientInfo) throws Exception {
+	public ResultDTO fetchClientDetails(String clientInfo) throws Exception {
 		List<ClientDetails> retValue = new ArrayList<>();
 		try {
 			clientInfo=CleanerUtils.initialDataClean(clientInfo.toLowerCase());
@@ -69,7 +73,7 @@ public class ClientService implements ClientServiceI {
 			} catch (Exception e) {
 				throw e;
 			}
-			return retValue;
+			return new ResultDTO(retValue, generateTextFromResults(retValue));
 		} catch (Exception e) {
 			throw e;
 		}
@@ -180,8 +184,35 @@ public class ClientService implements ClientServiceI {
 	}
 
 	@Override
-	public List<ClientDetails> getClientDetails() throws Exception {
-		return repo.findAll();
+	public ResultDTO getClientDetails() throws Exception {
+		List<ClientDetails> results = repo.findAll();
+		return new ResultDTO(results,generateTextFromResults(results));
 	}
-
+	
+	private String generateTextFromResults(List<ClientDetails> results) {
+		StringBuilder sb = new StringBuilder();
+		if(results.isEmpty()) {
+			sb.append("Sorry no results to display.");
+		}else {
+			AtomicInteger i = new AtomicInteger(1);
+			sb.append("There are "+results.size()+" matches."+System.lineSeparator());
+			results.forEach(x->{
+				Set<String> fields = generateDataTypeMap(ClientDetails.class).keySet();
+				sb.append("Result "+i.getAndIncrement()+System.lineSeparator());
+	            Class<?> clazz = x.getClass();
+				fields.forEach(y->{
+					String value = new String();
+					try {
+						Method m = clazz.getMethod("get" + y.substring(0, 1).toUpperCase() + y.substring(1));
+			            value = (m.invoke(x)==null)?"null":m.invoke(x).toString();
+					} catch (Exception e) {
+						logger.info(e.getMessage());
+						throw new RuntimeException(e.getMessage());
+					}
+					sb.append(y+" is "+value+System.lineSeparator());					
+				});
+			});
+		}
+		return sb.toString();
+	}
 }
