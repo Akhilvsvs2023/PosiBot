@@ -97,8 +97,12 @@ public class CleanerUtils {
 
 	public static String initialDataClean(String input) {
 		StringBuilder retVal = new StringBuilder();
+		input = input.replace(". my ", "\nmy ");
 		input = input.replace(" my ", "\nmy ");
 		input = input.replace(".my ", "\nmy ");
+		if(input.endsWith(".")) {
+			input = input.substring(0,input.length()-1);
+		}
 		Arrays.asList(input.split("\n")).forEach(x -> {
 			retVal.append("my ");
 			retVal.append(CleanerUtils.extractFieldName(x).replaceAll("\\s+", "").trim().toLowerCase() + " is ");

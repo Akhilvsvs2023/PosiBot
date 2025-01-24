@@ -1,5 +1,7 @@
 package com.psx.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -8,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.psx.dto.ResultDTO;
+import com.psx.entity.ClientDetails;
 import com.psx.service.ClientService;
 
 @RestController
@@ -27,7 +30,7 @@ public class ClientController {
 	}
 	
 	@PostMapping("/fetchClientDetails")
-	public ResultDTO fetchClientDetails(@RequestBody String clientInfo) throws Exception{
+	public List<ClientDetails> fetchClientDetails(@RequestBody String clientInfo) throws Exception{
 		try {
 			return service.fetchClientDetails(clientInfo);
 		}catch(Exception e) {
@@ -36,7 +39,7 @@ public class ClientController {
 	}
 	
 	@GetMapping("/getClientDetails")
-	public ResultDTO getClientDetails() throws Exception{
+	public List<ClientDetails> getClientDetails() throws Exception{
 		try {
 			return service.getClientDetails();
 		}catch(Exception e) {

@@ -16,13 +16,10 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
-import javax.management.RuntimeErrorException;
-
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.psx.dto.ResultDTO;
 import com.psx.entity.ClientDetails;
 import com.psx.repo.ClientRepository;
 import com.psx.utils.CleanerUtils;
@@ -54,7 +51,7 @@ public class ClientService implements ClientServiceI {
 	}
 
 	@Override
-	public ResultDTO fetchClientDetails(String clientInfo) throws Exception {
+	public List<ClientDetails> fetchClientDetails(String clientInfo) throws Exception {
 		List<ClientDetails> retValue = new ArrayList<>();
 		try {
 			clientInfo=CleanerUtils.initialDataClean(clientInfo.toLowerCase());
@@ -73,7 +70,7 @@ public class ClientService implements ClientServiceI {
 			} catch (Exception e) {
 				throw e;
 			}
-			return new ResultDTO(retValue, generateTextFromResults(retValue));
+			return retValue;
 		} catch (Exception e) {
 			throw e;
 		}
@@ -184,9 +181,9 @@ public class ClientService implements ClientServiceI {
 	}
 
 	@Override
-	public ResultDTO getClientDetails() throws Exception {
+	public List<ClientDetails> getClientDetails() throws Exception {
 		List<ClientDetails> results = repo.findAll();
-		return new ResultDTO(results,generateTextFromResults(results));
+		return results;
 	}
 	
 	private String generateTextFromResults(List<ClientDetails> results) {
